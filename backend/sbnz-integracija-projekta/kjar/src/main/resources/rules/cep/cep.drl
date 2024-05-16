@@ -4,6 +4,10 @@ import com.ftn.sbnz.model.models.AppUserOld;
 import com.ftn.sbnz.model.models.Alarm;
 import com.ftn.sbnz.model.events.LogEvent;
 import com.ftn.sbnz.model.events.BlockEvent;
+import com.ftn.sbnz.model.models.AppUser;
+import com.ftn.sbnz.model.models.Game;
+import com.ftn.sbnz.model.models.GameScore;
+
 
 rule "blokiraj"
     when
@@ -19,6 +23,15 @@ rule "blokiraj"
         }
         insert(new BlockEvent($user));
         insert(new Alarm($user, false));
+end
+
+
+
+rule "test"
+    when
+        $user: AppUser()
+    then
+        System.out.println("asdasdasdasdasd");
 end
 
 rule "hendlaj alarm"
