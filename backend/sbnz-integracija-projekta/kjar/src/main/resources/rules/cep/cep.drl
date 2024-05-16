@@ -1,0 +1,33 @@
+package cep;
+
+import com.ftn.sbnz.model.models.AppUser;
+import com.ftn.sbnz.model.models.Alarm;
+import com.ftn.sbnz.model.events.LogEvent;
+import com.ftn.sbnz.model.events.BlockEvent;
+
+rule "blokiraj"
+    when
+        $user: AppUser()
+        Number(intValue > 3) from accumulate (
+            LogEvent(good == false, user == $user)
+            over window: time(5m),
+            count(1)
+        )
+    then
+        modify($user){
+            setBlocked(true)
+        }
+        insert(new BlockEvent($user));
+        insert(new Alarm($user, false));
+end
+
+rule "hendlaj alarm"
+    when
+        $alarm: Alarm(checked == false)
+    then
+        System.out.println("Admin: " + $alarm);
+        modify($alarm){
+            setChecked(true)
+        }
+end
+
