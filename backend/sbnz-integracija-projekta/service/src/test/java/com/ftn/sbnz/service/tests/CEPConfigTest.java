@@ -20,7 +20,7 @@ public class CEPConfigTest {
         KieSession ksession = kContainer.newKieSession("cepKsession");
         SessionPseudoClock clock = ksession.getSessionClock();
 
-        AppUser user1 = new AppUser("1.1.1.1", false);
+        AppUserOld user1 = new AppUserOld("1.1.1.1", false);
         LogEvent log1 = new LogEvent(user1, true);
         LogEvent log2 = new LogEvent(user1, false);
         LogEvent log3 = new LogEvent(user1, false);

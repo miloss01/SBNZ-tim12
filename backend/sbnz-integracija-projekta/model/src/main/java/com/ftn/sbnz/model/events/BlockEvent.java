@@ -1,6 +1,6 @@
 package com.ftn.sbnz.model.events;
 
-import com.ftn.sbnz.model.models.AppUser;
+import com.ftn.sbnz.model.models.AppUserOld;
 import org.kie.api.definition.type.Expires;
 import org.kie.api.definition.type.Role;
 
@@ -10,20 +10,20 @@ import java.util.Objects;
 @Expires("15m")
 public class BlockEvent {
 
-    private AppUser user;
+    private AppUserOld user;
 
     public BlockEvent() {
     }
 
-    public BlockEvent(AppUser user) {
+    public BlockEvent(AppUserOld user) {
         this.user = user;
     }
 
-    public AppUser getUser() {
+    public AppUserOld getUser() {
         return user;
     }
 
-    public void setUser(AppUser user) {
+    public void setUser(AppUserOld user) {
         this.user = user;
     }
 

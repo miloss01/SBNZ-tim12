@@ -1,13 +1,13 @@
 package cep;
 
-import com.ftn.sbnz.model.models.AppUser;
+import com.ftn.sbnz.model.models.AppUserOld;
 import com.ftn.sbnz.model.models.Alarm;
 import com.ftn.sbnz.model.events.LogEvent;
 import com.ftn.sbnz.model.events.BlockEvent;
 
 rule "blokiraj"
     when
-        $user: AppUser()
+        $user: AppUserOld()
         Number(intValue > 3) from accumulate (
             LogEvent(good == false, user == $user)
             over window: time(5m),

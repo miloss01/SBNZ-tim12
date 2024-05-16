@@ -1,6 +1,6 @@
 package com.ftn.sbnz.model.events;
 
-import com.ftn.sbnz.model.models.AppUser;
+import com.ftn.sbnz.model.models.AppUserOld;
 import org.kie.api.definition.type.Expires;
 import org.kie.api.definition.type.Role;
 
@@ -11,23 +11,23 @@ import java.util.Objects;
 @Expires("10h")
 public class LogEvent implements Serializable {
 
-    private AppUser user;
+    private AppUserOld user;
     private Boolean good;
 
     public LogEvent() {
         super();
     }
 
-    public LogEvent(AppUser user, Boolean good) {
+    public LogEvent(AppUserOld user, Boolean good) {
         this.user = user;
         this.good = good;
     }
 
-    public AppUser getUser() {
+    public AppUserOld getUser() {
         return user;
     }
 
-    public void setUser(AppUser user) {
+    public void setUser(AppUserOld user) {
         this.user = user;
     }
 

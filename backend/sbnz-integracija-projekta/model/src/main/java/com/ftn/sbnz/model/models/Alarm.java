@@ -7,22 +7,22 @@ import java.util.Objects;
 @Role(Role.Type.FACT)
 public class Alarm {
 
-    private AppUser user;
+    private AppUserOld user;
     private Boolean checked;
 
     public Alarm() {
     }
 
-    public Alarm(AppUser user, Boolean checked) {
+    public Alarm(AppUserOld user, Boolean checked) {
         this.user = user;
         this.checked = checked;
     }
 
-    public AppUser getUser() {
+    public AppUserOld getUser() {
         return user;
     }
 
-    public void setUser(AppUser user) {
+    public void setUser(AppUserOld user) {
         this.user = user;
     }
 

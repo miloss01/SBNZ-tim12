@@ -1,59 +1,23 @@
 package com.ftn.sbnz.model.models;
 
-import org.kie.api.definition.type.Role;
-
 import java.io.Serializable;
-import java.util.Objects;
+import java.util.ArrayList;
 
-@Role(Role.Type.FACT)
+enum SubscriptionType {
+    BRONZE, SILVER, GOLD, PLATINUM
+}
+
 public class AppUser implements Serializable {
 
-    private String ip;
-    private Boolean blocked;
+    private String username;
+    private String password;
+    private Double balance;
+    private ArrayList<String> favouriteGenres;
+    private Double playtime;
+    private String timezone;
+    private SubscriptionType subscriptionType;
+    private ArrayList<Game> games;
+    private ArrayList<Game> wishlist;
+    private ArrayList<Friend> friends;
 
-    public AppUser() {
-        super();
-    }
-
-    public AppUser(String ip, Boolean blocked) {
-        this.ip = ip;
-        this.blocked = blocked;
-    }
-
-    public String getIp() {
-        return ip;
-    }
-
-    public void setIp(String ip) {
-        this.ip = ip;
-    }
-
-    public Boolean getBlocked() {
-        return blocked;
-    }
-
-    public void setBlocked(Boolean blocked) {
-        this.blocked = blocked;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof AppUser)) return false;
-        AppUser appUser = (AppUser) o;
-        return Objects.equals(ip, appUser.ip) && Objects.equals(blocked, appUser.blocked);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(ip, blocked);
-    }
-
-    @Override
-    public String toString() {
-        return "AppUser{" +
-                "ip='" + ip + '\'' +
-                ", blocked=" + blocked +
-                '}';
-    }
 }
