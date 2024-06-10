@@ -1,0 +1,37 @@
+<div>
+  <mat-card>
+    <form [formGroup]="sessionForm" (ngSubmit)="addSession()">
+      <label for="beginTime">Begin time</label>
+      <input matInput formControlName="beginTime" type="datetime-local" name="beginTime">
+
+      <mat-form-field appearance="outline">
+        <input matInput placeholder="Duration" formControlName="duration" type="number">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <input matInput placeholder="Game" formControlName="game">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <input matInput placeholder="Friends" formControlName="friends">
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" type="submit">Add session</button>
+    </form>
+  </mat-card>
+
+  <mat-divider></mat-divider>
+
+  <button mat-raised-button color="primary" (click)="getRecommendation()">Recommend</button>
+
+  <h3>BEST BUY: {{bestBuy}}</h3>
+  <h3>YOU WILL LIKE: {{youWillLike}}</h3>
+  <h3>MOST FRIENDS PLAY: {{mostFriendsPlay}}</h3>
+  <h3>BEST FREE TO PLAY: {{bestFreeToPlay}}</h3>
+  <h3>BEST RATED: {{bestRated}}</h3>
+  <h3>UNFINISHED: {{unfinished}}</h3>
+  
+  <hr width="30%">
+
+  <h3>FRIENDS: {{recommendedFriends}}</h3>
+</div>
