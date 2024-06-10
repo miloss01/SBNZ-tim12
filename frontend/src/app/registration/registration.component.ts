@@ -10,10 +10,12 @@ import { Router } from '@angular/router';
 export class RegistrationComponent implements OnInit {
 
   registerForm = new FormGroup({
-    name: new FormControl(),
-    lastname: new FormControl(),
-    email: new FormControl(),
+    // name: new FormControl(),
+    // lastname: new FormControl(),
+    username: new FormControl(),
     password: new FormControl(),
+    favoriteGenres: new FormControl(),
+    timezone: new FormControl(),
   })
 
   errorMessage: string = ''
