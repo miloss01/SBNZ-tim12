@@ -64,3 +64,7 @@ export interface FriendScoreDTO {
     friendRecommendation: AppUserDTO;
 }
 
+export interface LoginDTO {
+    username: string;
+    password: string;
+}

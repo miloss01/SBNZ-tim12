@@ -1,0 +1,11 @@
+<mat-toolbar color="primary">
+  <span>My Application</span>
+  <span class="spacer"></span>
+  <ng-container *ngIf="!isLoggedIn()">
+    <button mat-button (click)="navigateLogin()">Login</button>
+    <button mat-button (click)="navigateRegister()">Register</button>
+  </ng-container>
+  <ng-container *ngIf="isLoggedIn()">
+    <button mat-button (click)="logout()">Logout</button>
+  </ng-container>
+</mat-toolbar>

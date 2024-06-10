@@ -12,6 +12,7 @@ import { LoginComponent } from './login/login.component';
 import { GameComponent } from './game/game.component';
 import { OverviewComponent } from './overview/overview.component';
 import { ProfileComponent } from './profile/profile.component';
+import { ToolbarComponent } from './toolbar/toolbar.component';
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import { ProfileComponent } from './profile/profile.component';
     LoginComponent,
     GameComponent,
     OverviewComponent,
-    ProfileComponent
+    ProfileComponent,
+    ToolbarComponent
   ],
   imports: [
     BrowserModule,

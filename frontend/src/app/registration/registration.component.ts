@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AppUserDTO } from '../model/model';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-registration',
@@ -20,7 +22,7 @@ export class RegistrationComponent implements OnInit {
 
   errorMessage: string = ''
 
-  constructor(private router: Router) { }
+  constructor(private router: Router, private authService: AuthService) { }
 
   ngOnInit(): void {
   }
@@ -33,14 +35,31 @@ export class RegistrationComponent implements OnInit {
       return
     }
 
-    // let appUserDTO: AppUserDTO = {
-    //   id: null,
-    //   name: this.registerForm.value.name!,
-    //   lastName: this.registerForm.value.lastname!,
-    //   email: this.registerForm.value.email!,
-    //   password: this.registerForm.value.password!,
-    //   active: null
-    // }
+    let favouriteGenres: string[] = String(this.registerForm.value.favoriteGenres).split(",")
+
+    let user: AppUserDTO = {
+      username: this.registerForm.value.username,
+      password: this.registerForm.value.password,
+      balance: null,
+      favouriteGenres: favouriteGenres,
+      playtime: null,
+      timezone: this.registerForm.value.timezone,
+      subscriptionType: null,
+      games: null,
+      wishlist: null,
+      friends: null
+    }
+
+    this.authService.register(user).subscribe({
+      next: (res: AppUserDTO) => {
+        console.log(res)
+        this.router.navigate(["/login"])
+      },
+      error: (err) => {
+        console.log(err)
+        this.errorMessage = "Bad registration"
+      }
+    })
   }
 
 }

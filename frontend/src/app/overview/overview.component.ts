@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { AppUserDTO, GameDTO, SessionDTO } from '../model/model';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-overview',
@@ -25,9 +26,11 @@ export class OverviewComponent implements OnInit {
   
   recommendedFriends: string = ""
 
-  constructor() { }
+  constructor(private authService: AuthService) { }
 
   ngOnInit(): void {
+    let user: AppUserDTO = this.authService.getLoggedInUser()
+    console.log(user)
   }
 
   addSession() {
