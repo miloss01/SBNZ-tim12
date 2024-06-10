@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { GameDTO } from '../model/model';
+import { GameService } from '../services/game.service';
 
 @Component({
   selector: 'app-game',
@@ -22,7 +23,7 @@ export class GameComponent implements OnInit {
     saleEndDate: new FormControl(),
   })
 
-  constructor() { }
+  constructor(private gameService: GameService) { }
 
   ngOnInit(): void {
   }
@@ -42,6 +43,16 @@ export class GameComponent implements OnInit {
       betaReleaseDate: this.gameForm.value.betaReleaseDate,
       saleEndDate: this.gameForm.value.saleEndDate
     }
+
+    // nije testirano
+    this.gameService.postGame(game).subscribe({
+      next: (res: GameDTO) => {
+        console.log(res)
+      },
+      error: err => {
+        console.log(err)
+      }
+    })
 
   }
 

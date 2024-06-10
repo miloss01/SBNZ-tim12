@@ -70,4 +70,14 @@
       <li *ngIf="!user.friends || user.friends.length === 0">N/A</li>
     </ul>
   </div>
+
+  <div class="user-field">
+    <label>Notifications:</label>
+    <ul>
+      <li *ngFor="let notification of notifications">
+        {{ notification.name }}: {{notification.description}}
+      </li>
+      <li *ngIf="!notifications || notifications.length === 0">N/A</li>
+    </ul>
+  </div>
 </div>

@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { AppUserDTO, GameDTO } from '../model/model';
+import { AppUserDTO, GameDTO, NotificationDTO } from '../model/model';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-profile',
@@ -21,7 +22,9 @@ export class ProfileComponent implements OnInit {
     friends: null
   };
 
-  constructor() { }
+  notifications: NotificationDTO[] = []
+
+  constructor(private authService: AuthService) { }
 
   ngOnInit(): void {
     // od beka da se povuce user, mozda da se user ceo cuva u localstorage pa da se odatle uzme
@@ -37,6 +40,19 @@ export class ProfileComponent implements OnInit {
       wishlist: [],
       friends: []
     }
+    // sa beka da se dovuku obavestenja, ovo je samo za testiranje
+    let not1: NotificationDTO = {
+      name: 'asd',
+      description: 'dfgdfgdfg',
+      user: this.authService.getLoggedInUser()
+    }
+    let not2: NotificationDTO = {
+      name: 'asd',
+      description: 'dfgdfgdfg',
+      user: this.authService.getLoggedInUser()
+    }
+    this.notifications.push(not1)
+    this.notifications.push(not2)
   }
 
 }

@@ -20,6 +20,17 @@
     </form>
   </mat-card>
 
+  <mat-card>
+    <form [formGroup]="buyGameForm" (ngSubmit)="buyGame()">
+
+      <mat-form-field appearance="outline">
+        <input matInput placeholder="Game" formControlName="game">
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" type="submit">Buy game</button>
+    </form>
+  </mat-card>
+
   <mat-divider></mat-divider>
 
   <button mat-raised-button color="primary" (click)="getRecommendation()">Recommend</button>

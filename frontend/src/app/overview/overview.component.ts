@@ -17,6 +17,10 @@ export class OverviewComponent implements OnInit {
     friends: new FormControl(),
   })
 
+  buyGameForm = new FormGroup({
+    game: new FormControl(),
+  })
+
   bestBuy: string = ""
   youWillLike: string = ""
   mostFriendsPlay: string = ""
@@ -78,6 +82,13 @@ export class OverviewComponent implements OnInit {
       friends: friends
     }
     console.log(session)
+  }
+
+  buyGame() {
+    console.log('Value of form: ' + JSON.stringify(this.buyGameForm.value))
+
+    // da posalje na bek da kupi igricu
+
   }
 
   getRecommendation() {
