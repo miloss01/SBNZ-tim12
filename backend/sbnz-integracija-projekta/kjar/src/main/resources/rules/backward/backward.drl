@@ -1,0 +1,17 @@
+package backward;
+
+import com.ftn.sbnz.model.models.Plant;
+
+query isContainedIn( String x, String y )
+  plant: Plant( x, y; )
+  or
+  ( Plant( z, y; ) and isContainedIn( x, z; ) )
+end
+
+rule "go"
+when
+    $biljka: Plant($plant: plant)
+    isContainedIn($plant, "Bez pupoljka";)
+then
+    System.out.println($biljka);
+end
