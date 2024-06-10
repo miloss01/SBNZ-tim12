@@ -1,0 +1,73 @@
+<div class="user-details">
+  <h2>User Details</h2>
+  
+  <div class="user-field">
+    <label>Username:</label>
+    <span>{{ user.username }}</span>
+  </div>
+  
+  <div class="user-field">
+    <label>Password:</label>
+    <span>{{ user.password || 'N/A' }}</span>
+  </div>
+  
+  <div class="user-field">
+    <label>Balance:</label>
+    <span>{{ user.balance !== null ? user.balance : 'N/A' }}</span>
+  </div>
+  
+  <div class="user-field">
+    <label>Favourite Genres:</label>
+    <ul>
+      <li *ngFor="let genre of user.favouriteGenres">
+        {{ genre }}
+      </li>
+      <li *ngIf="!user.favouriteGenres || user.favouriteGenres.length === 0">N/A</li>
+    </ul>
+  </div>
+  
+  <div class="user-field">
+    <label>Playtime:</label>
+    <span>{{ user.playtime !== null ? user.playtime : 'N/A' }}</span>
+  </div>
+  
+  <div class="user-field">
+    <label>Timezone:</label>
+    <span>{{ user.timezone || 'N/A' }}</span>
+  </div>
+  
+  <div class="user-field">
+    <label>Subscription Type:</label>
+    <span>{{ user.subscriptionType || 'N/A' }}</span>
+  </div>
+  
+  <div class="user-field">
+    <label>Games:</label>
+    <ul>
+      <li *ngFor="let game of user.games">
+        {{ game.name }}
+      </li>
+      <li *ngIf="!user.games || user.games.length === 0">N/A</li>
+    </ul>
+  </div>
+  
+  <div class="user-field">
+    <label>Wishlist:</label>
+    <ul>
+      <li *ngFor="let game of user.wishlist">
+        {{ game.name }}
+      </li>
+      <li *ngIf="!user.wishlist || user.wishlist.length === 0">N/A</li>
+    </ul>
+  </div>
+  
+  <div class="user-field">
+    <label>Friends:</label>
+    <ul>
+      <li *ngFor="let friend of user.friends">
+        {{ friend.username }}
+      </li>
+      <li *ngIf="!user.friends || user.friends.length === 0">N/A</li>
+    </ul>
+  </div>
+</div>

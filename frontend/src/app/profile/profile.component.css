@@ -1,0 +1,30 @@
+.user-details {
+  max-width: 600px;
+  margin: auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.user-details h2 {
+  text-align: center;
+}
+
+.user-field {
+  margin-bottom: 16px;
+}
+
+.user-field label {
+  font-weight: bold;
+}
+
+.user-field span,
+.user-field ul {
+  margin-left: 10px;
+}
+
+.user-field ul {
+  list-style-type: disc;
+  padding-left: 20px;
+}

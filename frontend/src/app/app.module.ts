@@ -11,6 +11,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { LoginComponent } from './login/login.component';
 import { GameComponent } from './game/game.component';
 import { OverviewComponent } from './overview/overview.component';
+import { ProfileComponent } from './profile/profile.component';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,8 @@ import { OverviewComponent } from './overview/overview.component';
     RegistrationComponent,
     LoginComponent,
     GameComponent,
-    OverviewComponent
+    OverviewComponent,
+    ProfileComponent
   ],
   imports: [
     BrowserModule,
