@@ -1,0 +1,19 @@
+<div class="register-container">
+  <mat-card>
+    <form [formGroup]="registerForm" (ngSubmit)="register()">
+      <mat-form-field appearance="outline">
+        <input matInput placeholder="Name" formControlName="name">
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <input matInput placeholder="Last Name" formControlName="lastname">
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <input matInput placeholder="Email" formControlName="email" type="email">
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <input matInput placeholder="Password" formControlName="password" type="password">
+      </mat-form-field>
+      <button mat-raised-button color="primary" type="submit">Register</button>
+    </form>
+  </mat-card>
+</div>
