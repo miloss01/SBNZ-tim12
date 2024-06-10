@@ -1,0 +1,51 @@
+<div class="register-container">
+  <mat-card>
+    <form [formGroup]="gameForm" (ngSubmit)="addGame()">
+      <mat-form-field appearance="outline">
+        <input matInput placeholder="Name" formControlName="name">
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <input matInput placeholder="Genre" formControlName="genre">
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <input matInput placeholder="Price" formControlName="price">
+      </mat-form-field>
+      <!-- <mat-form-field appearance="outline"> -->
+        <label for="releaseDate">Release date</label>
+        <input matInput formControlName="releaseDate" type="datetime-local" name="releaseDate">
+      <!-- </mat-form-field> -->
+
+      <label for="singlePlayer">SinglePlayer</label>
+      <input formControlName="singlePlayer" type="checkbox" name="singlePlayer">
+
+      <mat-form-field appearance="outline">
+        <input matInput placeholder="On Sale" formControlName="onSale" type="number">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <input matInput placeholder="Rating" formControlName="rating" type="number">
+      </mat-form-field>
+
+      <label for="beta">Beta</label>
+      <input formControlName="beta" type="checkbox" name="beta">
+
+      <br>
+      <label for="betaReleaseDate">Beta release date</label>
+      <input matInput formControlName="betaReleaseDate" type="datetime-local" name="betaReleaseDate">
+
+      <label for="saleEndDate">Sale end date</label>
+      <input matInput formControlName="saleEndDate" type="datetime-local" name="saleEndDate">
+
+      <button mat-raised-button color="primary" type="submit">Add game</button>
+    </form>
+  </mat-card>
+  <!-- genre: string;
+    price: number;
+    releaseDate: string;
+    singlePlayer: boolean;
+    onSale: number;
+    rating: number;
+    beta: boolean;
+    betaReleaseDate: string;
+    saleEndDate: string; -->
+</div>

@@ -20,6 +20,7 @@ export interface FriendDTO extends AppUserDTO {
 }
 
 export interface GameDTO {
+    name: string;
     genre: string;
     price: number;
     releaseDate: string;
