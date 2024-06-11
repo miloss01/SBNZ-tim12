@@ -9,6 +9,7 @@ import com.ftn.sbnz.model.models.Purchase;
 import com.ftn.sbnz.model.models.Notification;
 import com.ftn.sbnz.model.models.enums.RecommendationType;
 import com.ftn.sbnz.model.models.enums.SubscriptionType;
+import com.ftn.sbnz.model.models.FriendScore;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -449,3 +450,74 @@ rule "Ako korisnik nema sesije u poslednjih 30 dana, smanji SubscriptionType"
         System.out.println("Korisniku: " + $user.getUsername() + " je smanjen sub type i sad je: " + $user.getSubscriptionType());
         System.out.println("-----------------------------------------------------------------");
 end
+
+rule "Ako trenutni korisnik i neki drugi korisnik imaju najviše sati provedenih na istoj igri povećaj score tog korisnika"
+no-loop true
+    when
+        $user : AppUser()
+        $friend : AppUser($user != $friend)
+        $friendScore : FriendScore($user == user && $friend == friendRecommendation)
+
+        $userSessions : List() from collect(
+            $session : Session($user == user) over window:time(10d)
+        )
+
+        $friendSessions : List() from collect(
+            $session : Session($friend == user) over window:time(10d)
+        )
+
+    then
+        HashMap<Game, Integer> map = new HashMap<>();
+        for (Object s : $userSessions) {
+          Session session = (Session) s;
+          if (map.containsKey(session.getGame()))
+              map.put(session.getGame(), map.get(session.getGame()) + session.getDuration());
+          else {
+              map.put(session.getGame(), session.getDuration());
+          }
+        }
+
+        Game mostPlayedGame = null;
+        Integer time = 0;
+        for (Map.Entry<Game, Integer> entry : map.entrySet()) {
+          Game game = entry.getKey();
+          Integer timeForGame = entry.getValue();
+
+          if (timeForGame > time) {
+              mostPlayedGame = game;
+              time = timeForGame;
+          }
+        }
+
+        HashMap<Game, Integer> friendMap = new HashMap<>();
+        for (Object s : $friendSessions) {
+          Session session = (Session) s;
+          if (friendMap.containsKey(session.getGame()))
+              friendMap.put(session.getGame(), friendMap.get(session.getGame()) + session.getDuration());
+          else {
+              friendMap.put(session.getGame(), session.getDuration());
+          }
+        }
+
+        Game friendsMostPlayedGame = null;
+        time = 0;
+        for (Map.Entry<Game, Integer> entry : friendMap.entrySet()) {
+          Game game = entry.getKey();
+          Integer timeForGame = entry.getValue();
+
+          if (timeForGame > time) {
+              friendsMostPlayedGame = game;
+              time = timeForGame;
+          }
+        }
+        System.out.println("Ako trenutni korisnik i neki drugi korisnik imaju najviše sati provedenih na istoj igri povećaj score tog korisnika");
+        if(mostPlayedGame != null && friendsMostPlayedGame != null && mostPlayedGame.getName() == friendsMostPlayedGame.getName()){
+            modify($friendScore){
+                updateScore(10d)
+            }
+            System.out.println($user.getUsername() + " i " + $friend.getUsername() + " su najvise igrali: " + mostPlayedGame.getName());
+        }
+
+        System.out.println("-----------------------------------------------------------------");
+end
+

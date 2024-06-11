@@ -55,22 +55,27 @@ public class GameTests {
         gameScore3.setUser(user);
         gameScore3.setScore(0d);
 
+        AppUser friend = new AppUser("BestoFrendo", 100d, new ArrayList<>(List.of(game1, game2)));
+        friend.setFavouriteGenres(new ArrayList<>());
+        user.getFriends().add(friend);
+        FriendScore friendScore = new FriendScore(0d, user, friend);
 
         for(int i = 0; i < 10; i++){
             Session session = new Session(LocalDateTime.ofInstant(Instant.ofEpochMilli(clock.getCurrentTime()), ZoneId.systemDefault()), 10, game1, new ArrayList<>(), user);
+            Session session1 = new Session(LocalDateTime.ofInstant(Instant.ofEpochMilli(clock.getCurrentTime()), ZoneId.systemDefault()), 15, game1, new ArrayList<>(), friend);
             ksession.insert(session);
+            ksession.insert(session1);
         }
 
         clock.advanceTime(8, TimeUnit.DAYS);
 
         for(int i = 0; i < 10; i++){
             Session session = new Session(LocalDateTime.ofInstant(Instant.ofEpochMilli(clock.getCurrentTime()), ZoneId.systemDefault()), 5, game2, new ArrayList<>(), user);
+            Session session1 = new Session(LocalDateTime.ofInstant(Instant.ofEpochMilli(clock.getCurrentTime()), ZoneId.systemDefault()), 5, game2, new ArrayList<>(), friend);
             ksession.insert(session);
+            ksession.insert(session1);
         }
 
-        AppUser friend = new AppUser("BestoFrendo", 100d, new ArrayList<>(List.of(game1, game2)));
-        friend.setFavouriteGenres(new ArrayList<>());
-        user.getFriends().add(friend);
         Purchase purchase = new Purchase(game1, user, LocalDateTime.now(), 30d);
         Purchase purchase1 = new Purchase(game2, user, LocalDateTime.now(), 30d);
         Purchase purchase2 = new Purchase(game2, user, LocalDateTime.now().minusDays(1), 30d);
@@ -88,6 +93,7 @@ public class GameTests {
         ksession.insert(gameScore2);
         ksession.insert(gameScore3);
         ksession.insert(friend);
+        ksession.insert(friendScore);
 
         ksession.insert(purchase);
         ksession.insert(purchase1);
