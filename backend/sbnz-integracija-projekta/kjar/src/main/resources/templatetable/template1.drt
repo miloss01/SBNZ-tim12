@@ -1,0 +1,40 @@
+template header
+subType
+days
+amount
+sale
+
+package templatetable;
+
+import com.ftn.sbnz.model.models.Game;
+import com.ftn.sbnz.model.models.AppUser;
+import com.ftn.sbnz.model.models.GameScore;
+import com.ftn.sbnz.model.models.FriendScore;
+import com.ftn.sbnz.model.models.Session;
+import com.ftn.sbnz.model.models.Recommendation;
+import com.ftn.sbnz.model.models.Purchase;
+import com.ftn.sbnz.model.models.Notification;
+import com.ftn.sbnz.model.models.enums.RecommendationType;
+import com.ftn.sbnz.model.models.enums.SubscriptionType;
+import com.ftn.sbnz.model.models.FriendScore;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.List;
+
+template "template1"
+
+rule "Ako je korisnik @{subType} i u poslednjih @{days} dana je potrošio @{amount} eura, ostvaruje popust od @{sale}% na kupovinu igre."
+    when
+        $user : AppUser(subscriptionType == SubscriptionType.@{subType})
+        $totalAmount: Number(doubleValue > @{amount}) from accumulate(
+            $purchase : Purchase($user == user) over window:time(@{days}d),
+            count($purchase)
+        )
+    then
+        System.out.println("pravilo");
+        insert(new Notification("Ostvarujes popust", "Ostvarujes popust od @{sale}% na kupovinu igre", $user));
+        System.out.println("-----------------------------------------------------------------");
+end
+
+end template

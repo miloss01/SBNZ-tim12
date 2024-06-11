@@ -1,5 +1,6 @@
 package com.ftn.sbnz.service.tests;
 
+import java.io.InputStream;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,10 +14,21 @@ import java.util.stream.Collectors;
 import com.ftn.sbnz.model.models.*;
 import com.ftn.sbnz.model.models.enums.SubscriptionType;
 import org.drools.core.time.SessionPseudoClock;
+import org.drools.template.DataProvider;
+import org.drools.template.DataProviderCompiler;
+import org.drools.template.objects.ArrayDataProvider;
 import org.junit.Test;
 import org.kie.api.KieServices;
+import org.kie.api.builder.Message;
+import org.kie.api.builder.Results;
+import org.kie.api.io.ResourceType;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
+import org.kie.internal.utils.KieHelper;
+import org.kie.api.builder.KieBuilder;
+import org.kie.api.builder.KieFileSystem;
+import org.kie.api.builder.Message.Level;
+import org.kie.api.runtime.conf.ClockTypeOption;
 
 public class GameTests {
 
@@ -190,5 +202,63 @@ public class GameTests {
 
         String str = "adsasdsada";
         str.startsWith("asdas");
+    }
+
+    @Test
+    public void template1Test() {
+        InputStream template = GameTests.class.getResourceAsStream("/templatetable/template1.drt");
+
+        DataProvider dataProvider = new ArrayDataProvider(new String[][]{
+                new String[]{"BRONZE", "5", "100", "5"},
+                new String[]{"SILVER", "10", "200", "10"},
+                new String[]{"GOLD", "20", "300", "20"},
+                new String[]{"PLATINUM", "30", "400", "30"},
+        });
+
+        DataProviderCompiler converter = new DataProviderCompiler();
+        String drl = converter.compile(dataProvider, template);
+
+        System.out.println(drl);
+
+//        KieSession ksession = createKieSessionFromDRL(drl);
+
+    }
+
+    @Test
+    public void template2Test() {
+        InputStream template = GameTests.class.getResourceAsStream("/templatetable/template2.drt");
+
+        DataProvider dataProvider = new ArrayDataProvider(new String[][]{
+                new String[]{"2", "20", "10"},
+                new String[]{"4", "15", "30"},
+                new String[]{"6", "10", "60"},
+                new String[]{"8", "8", "100"},
+        });
+
+        DataProviderCompiler converter = new DataProviderCompiler();
+        String drl = converter.compile(dataProvider, template);
+
+        System.out.println(drl);
+
+//        KieSession ksession = createKieSessionFromDRL(drl);
+
+    }
+
+    private KieSession createKieSessionFromDRL(String drl){
+        KieHelper kieHelper = new KieHelper();
+        kieHelper.addContent(drl, ResourceType.DRL);
+
+        Results results = kieHelper.verify();
+
+        if (results.hasMessages(Message.Level.WARNING, Message.Level.ERROR)){
+            List<Message> messages = results.getMessages(Message.Level.WARNING, Message.Level.ERROR);
+            for (Message message : messages) {
+                System.out.println("Error: "+message.getText());
+            }
+
+            throw new IllegalStateException("Compilation errors were found. Check the logs.");
+        }
+
+        return kieHelper.build().newKieSession();
     }
 }

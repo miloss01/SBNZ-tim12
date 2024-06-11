@@ -638,3 +638,30 @@ rule "Ako je igrica BEST_BUY i na sale-u je još manje od 24h obavesti korisnika
         insert(new Notification("Game is on sale for less than 24h", $recommendation.getUser().getUsername() + " got a notification about the game " + $recommendation.getGame().getName(), $recommendation.getUser()));
 end
 
+
+//rule "Ako se vremenska zona korisnika razlikuje od trenutnog korisnika za <2h/<4h/<6h/<8h/>8h i korisnik ima manje od 20/15/10/8/6 prijatelja, smanji score korisnika za 10/30/60/100/200"
+//    when
+//        $user : AppUser(subscriptionType == SubscriptionType.BRONZE)
+//        $totalAmount: Number(doubleValue > 100) from accumulate(
+//            $purchase : Purchase($user == user) over window:time(10d),
+//            count($purchase)
+//        )
+//    then
+//        System.out.println("pravilo");
+//        insert(new Notification("Ostvarujes popust", "Ostvarujes popust od 50% na kupovinu igre", $user));
+//        System.out.println("-----------------------------------------------------------------");
+//end
+
+//rule "Ako se vremenska zona korisnika razlikuje od trenutnog korisnika za <2h/<4h/<6h/<8h/>8h i korisnik ima manje od 20/15/10/8/6 prijatelja, smanji score korisnika za 10/30/60/100/200"
+//    when
+//        $user1 : AppUser()
+//        $user2 : AppUser($user1 != $user2 && friends.size() < 20 && Math.abs(Integer.parseInt($user1.getTimezone()) - Integer.parseInt($user2.getTimezone())) < 4)
+//        $friendScore : FriendScore(user == $user1 && friendRecommendation == $user2)
+//    then
+//        modify($friendScore){
+//            setScore($friendScore.getScore() - 10)
+//        }
+//
+//        System.out.println("pravilo");
+//        System.out.println("-----------------------------------------------------------------");
+//end
