@@ -8,6 +8,7 @@ import com.ftn.sbnz.model.models.Recommendation;
 import com.ftn.sbnz.model.models.Purchase;
 import com.ftn.sbnz.model.models.Notification;
 import com.ftn.sbnz.model.models.enums.RecommendationType;
+import com.ftn.sbnz.model.models.enums.SubscriptionType;
 import java.time.LocalDateTime;
 
 
@@ -259,5 +260,38 @@ rule "Obavesti korisnika ako igrica na korisnikovom wishlistu ode na sale"
         System.out.println("Obavesti korisnika ako igrica na korisnikovom wishlistu ode na sale");
         System.out.println($user.getUsername() + " je dobio notifikaciju za igru " + $game.getName() + " da je na sale od " + $game.getOnSale());
         insert(new Notification("Igrica je na popustu", $game.getName() + " je na popustu od " + $game.getOnSale(), $user));
+        System.out.println("-----------------------------------------------------------------");
+end
+
+rule "Ako korisnik ima subscription type veći od BRONZE i korisnik je dodao igru na wishlistu i igra otvori open betu"
+    when
+        $user : AppUser(subscriptionType != null && subscriptionType != SubscriptionType.BRONZE)
+        $game : Game($user.getWishlist().contains($game) && beta == true && betaReleaseDate != null && LocalDateTime.now().isAfter(betaReleaseDate))
+    then
+        System.out.println("Ako korisnik ima subscription type veći od BRONZE i korisnik je dodao igru na wishlistu i igra otvori open betu");
+        System.out.println($user.getUsername() + " je dobio notifikaciju za igru " + $game.getName() + " da je otvorena beta od " + $game.getBetaReleaseDate());
+        insert(new Notification("Dodati ste kao kandidat za betu za igricu", $game.getName() + " je otvorila betu od " + $game.getBetaReleaseDate(), $user));
+        System.out.println("-----------------------------------------------------------------");
+end
+
+rule "Ako korisnik ima subscription type veći od SILVERA i korisnik je dodao igru na wishlistu i igra otvori open betu"
+    when
+        $user : AppUser(subscriptionType != null && subscriptionType != SubscriptionType.BRONZE && subscriptionType != SubscriptionType.SILVER)
+        $game : Game($user.getWishlist().contains($game) && beta == true && betaReleaseDate != null && LocalDateTime.now().isAfter(betaReleaseDate))
+    then
+        System.out.println("Ako korisnik ima subscription type veći od SILVERA i korisnik je dodao igru na wishlistu i igra otvori open betu");
+        System.out.println($user.getUsername() + " je dobio notifikaciju i kljuc za igru " + $game.getName() + " da je otvorena beta od " + $game.getBetaReleaseDate());
+        insert(new Notification("Dobili ste kljuc za betu za igricu", $game.getName() + " je otvorila betu od " + $game.getBetaReleaseDate(), $user));
+        System.out.println("-----------------------------------------------------------------");
+end
+
+rule "Ako je igrica u korisnikovom wishlistu otvorila open betu i korisnik nema subscription ponudi popust na subscription"
+    when
+        $user : AppUser(subscriptionType == null)
+        $game : Game($user.getWishlist().contains($game) && beta == true && betaReleaseDate != null && LocalDateTime.now().isAfter(betaReleaseDate))
+    then
+        System.out.println("Ako je igrica u korisnikovom wishlistu otvorila open betu i korisnik nema subscription ponudi popust na subscription");
+        System.out.println($user.getUsername() + " je dobio notifikaciju za popust na subscription");
+        insert(new Notification("Dobili ste popust na subscription", $game.getName() + " je otvorila betu od " + $game.getBetaReleaseDate(), $user));
         System.out.println("-----------------------------------------------------------------");
 end

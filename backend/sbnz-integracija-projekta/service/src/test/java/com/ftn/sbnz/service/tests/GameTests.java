@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.ftn.sbnz.model.models.*;
+import com.ftn.sbnz.model.models.enums.SubscriptionType;
 import org.drools.core.time.SessionPseudoClock;
 import org.junit.Test;
 import org.kie.api.KieServices;
@@ -33,8 +34,9 @@ public class GameTests {
         user.setFavouriteGenres(favouriteZenres);
         user.setUsername("123");
         user.setBalance(25d);
+//        user.setSubscriptionType(SubscriptionType.GOLD);
 
-        Game game1 = new Game("game1", "MMORPG", 10d, LocalDateTime.now().minusMonths(3), true, 5d, 8d, false, null, LocalDateTime.now().plusMonths(3));
+        Game game1 = new Game("game1", "MMORPG", 10d, LocalDateTime.now().minusMonths(3), true, 5d, 8d, true, LocalDateTime.now().minusMonths(3), LocalDateTime.now().plusMonths(3));
         Game game2 = new Game("game2", "FPS", 5d, LocalDateTime.now().minusMonths(16), false, 10d, 8d, false, null, LocalDateTime.now().minusMonths(3));
         Game game3 = new Game("game3", "RPG", 30d, LocalDateTime.now().minusMonths(7), false, 20d, 4d, false, null, null);
         GameScore gameScore1 = new GameScore();
