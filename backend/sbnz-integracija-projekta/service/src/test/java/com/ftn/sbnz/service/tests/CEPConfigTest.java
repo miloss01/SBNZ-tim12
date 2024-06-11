@@ -102,9 +102,9 @@ public class CEPConfigTest {
 
 
         for(int i = 0; i < 10; i++){
-            Session session = new Session(LocalDateTime.now().minusDays(8L), 10, game1, new ArrayList<>());
+            Session session = new Session(LocalDateTime.now().minusDays(8L), 10, game1, new ArrayList<>(), user);
             ksession.insert(session);
-            Session session1 = new Session(LocalDateTime.now().minusDays(3L), 10, game2, new ArrayList<>());
+            Session session1 = new Session(LocalDateTime.now().minusDays(3L), 10, game2, new ArrayList<>(), user);
             ksession.insert(session1);
         }
 

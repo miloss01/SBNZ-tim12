@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 
-@Timestamp("beginTime")
 @PropertyReactive
 @Role(Role.Type.EVENT)
 public class Session implements Serializable {
@@ -19,18 +18,21 @@ public class Session implements Serializable {
     // ne znam u kojim jedinicama je vreme
     private Integer duration;
     private Game game;
-    private ArrayList<Friend> friends;
+    private ArrayList<AppUser> friends;
+
+    private AppUser user;
 
     public Session() {
         super();
     }
 
-    public Session(LocalDateTime beginTime, Integer duration, Game game, ArrayList<Friend> friends) {
+    public Session(LocalDateTime beginTime, Integer duration, Game game, ArrayList<AppUser> friends, AppUser user) {
         super();
         this.beginTime = beginTime;
         this.duration = duration;
         this.game = game;
         this.friends = friends;
+        this.user = user;
     }
 
     public void setBeginTime(LocalDateTime beginTime) {
@@ -45,7 +47,7 @@ public class Session implements Serializable {
         this.game = game;
     }
 
-    public void setFriends(ArrayList<Friend> friends) {
+    public void setFriends(ArrayList<AppUser> friends) {
         this.friends = friends;
     }
 
@@ -61,7 +63,15 @@ public class Session implements Serializable {
         return game;
     }
 
-    public ArrayList<Friend> getFriends() {
+    public ArrayList<AppUser> getFriends() {
         return friends;
+    }
+
+    public AppUser getUser() {
+        return user;
+    }
+
+    public void setUser(AppUser user) {
+        this.user = user;
     }
 }

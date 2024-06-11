@@ -29,7 +29,7 @@ public class Game implements Serializable {
     }
 
     private Boolean singlePlayer;
-    private Double onSale;
+    private Double onSale = 0d;
     private Double rating;
     private Boolean beta;
     private LocalDateTime betaReleaseDate;
