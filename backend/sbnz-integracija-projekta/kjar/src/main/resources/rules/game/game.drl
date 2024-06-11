@@ -295,3 +295,68 @@ rule "Ako je igrica u korisnikovom wishlistu otvorila open betu i korisnik nema 
         insert(new Notification("Dobili ste popust na subscription", $game.getName() + " je otvorila betu od " + $game.getBetaReleaseDate(), $user));
         System.out.println("-----------------------------------------------------------------");
 end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+rule "Ako je neka igrica u poslednja 3 dana kupljena više od 5 puta, povećati onSale za 10"
+    when
+        $game : Game()
+        $numOfPurchases: Number(intValue > 5) from accumulate(
+            $purchase : Purchase($game == game) over window:time(3d),
+            count($purchase)
+        )
+    then
+        modify($game){
+            setOnSale($game.getOnSale() + 10)
+        }
+        System.out.println("num je: " + $numOfPurchases + " za " + $game.getName());
+        System.out.println("Ako je neka igrica u poslednja 3 dana kupljena više od 5 puta, povećati onSale za 10");
+        System.out.println("Igrici: " + $game.getName() + " je povecan onSale za 10 i sad je: " + $game.getOnSale());
+        System.out.println("-----------------------------------------------------------------");
+end
+
+rule "Ako korisnik nema sesije u poslednjih 30 dana, smanji SubscriptionType"
+    when
+        $user : AppUser()
+        $numOfSessions: Number(intValue == 0) from accumulate(
+            $session : Session($user == user) over window:time(30d),
+            count($session)
+        )
+    then
+        SubscriptionType subType = null;
+        if ($user.getSubscriptionType() == SubscriptionType.BRONZE)
+            subType = null;
+        else if ($user.getSubscriptionType() == SubscriptionType.SILVER)
+            subType = SubscriptionType.BRONZE;
+        else if ($user.getSubscriptionType() == SubscriptionType.GOLD)
+            subType = SubscriptionType.SILVER;
+        else if ($user.getSubscriptionType() == SubscriptionType.PLATINUM)
+            subType = SubscriptionType.GOLD;
+
+        modify($user){
+            setSubscriptionType(subType)
+        }
+
+        System.out.println("num je: " + $numOfSessions + " za " + $user.getUsername());
+        System.out.println("Ako korisnik nema sesije u poslednjih 30 dana, smanji SubscriptionType");
+        System.out.println("Korisniku: " + $user.getUsername() + " je smanjen sub type i sad je: " + $user.getSubscriptionType());
+        System.out.println("-----------------------------------------------------------------");
+end

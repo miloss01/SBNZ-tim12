@@ -34,7 +34,7 @@ public class GameTests {
         user.setFavouriteGenres(favouriteZenres);
         user.setUsername("123");
         user.setBalance(25d);
-//        user.setSubscriptionType(SubscriptionType.GOLD);
+        user.setSubscriptionType(SubscriptionType.GOLD);
 
         Game game1 = new Game("game1", "MMORPG", 10d, LocalDateTime.now().minusMonths(3), true, 5d, 8d, true, LocalDateTime.now().minusMonths(3), LocalDateTime.now().plusMonths(3));
         Game game2 = new Game("game2", "FPS", 5d, LocalDateTime.now().minusMonths(16), false, 10d, 8d, false, null, LocalDateTime.now().minusMonths(3));
@@ -73,6 +73,9 @@ public class GameTests {
         user.getFriends().add(friend);
         Purchase purchase = new Purchase(game1, user, LocalDateTime.now(), 30d);
         Purchase purchase1 = new Purchase(game2, user, LocalDateTime.now(), 30d);
+        Purchase purchase2 = new Purchase(game2, user, LocalDateTime.now().minusDays(1), 30d);
+        Purchase purchase3 = new Purchase(game2, user, LocalDateTime.now().minusDays(1), 30d);
+        Purchase purchase4 = new Purchase(game2, user, LocalDateTime.now().minusDays(1), 30d);
 
         user.getWishlist().add(game1);
         user.getWishlist().add(game2);
@@ -88,6 +91,9 @@ public class GameTests {
 
         ksession.insert(purchase);
         ksession.insert(purchase1);
+        ksession.insert(purchase2);
+        ksession.insert(purchase3);
+        ksession.insert(purchase4);
 
         int rulesFired = -1;
 
