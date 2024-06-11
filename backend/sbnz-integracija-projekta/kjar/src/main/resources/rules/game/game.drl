@@ -5,7 +5,10 @@ import com.ftn.sbnz.model.models.AppUser;
 import com.ftn.sbnz.model.models.GameScore;
 import com.ftn.sbnz.model.models.Session;
 import com.ftn.sbnz.model.models.Recommendation;
+import com.ftn.sbnz.model.models.Purchase;
+import com.ftn.sbnz.model.models.Notification;
 import com.ftn.sbnz.model.models.enums.RecommendationType;
+import java.time.LocalDateTime;
 
 
 
@@ -13,7 +16,7 @@ import com.ftn.sbnz.model.models.enums.RecommendationType;
 rule "povecaj score za zanr"
     when
         $user: AppUser()
-        $game: Game($user.getFavouriteGenres.contains($game.getGenre()))
+        $game: Game($user.getFavouriteGenres().contains($game.getGenre()))
         $gameScore: GameScore($user == $gameScore.getUser() && $game == $gameScore.getGame())
     then
         System.out.println("------------povecaj score za zanr------------");
@@ -106,11 +109,18 @@ salience -1
         $gameScore: GameScore($user == user && $game == game)
 
         $spot: Number(intValue < 10) from accumulate(
-            score: Number(intValue < $gameScore.getScore()) from accumulate(
-                $game2Score: GameScore($user == user && $game != game),
-                sum($game2Score.getScore())
-            ),
-            count(score)
+            $game1Score: GameScore($game != game && $user == user && $gameScore.getScore() < score),
+            count($game1Score)
+        )
+
+        accumulate(
+            $game1: Game(),
+            $count: count($game1)
+        )
+
+        $numOfGames: Number(intValue < ($count * 30 / 100)) from accumulate(
+            $game2: Game(price < $game.getPrice() && $game2 != $game),
+            count($game2)
         )
     then
         insert(new Recommendation(RecommendationType.BEST_BUY,"",$user, $game));
@@ -127,11 +137,8 @@ salience -1
         $gameScore: GameScore($user == user && $game == game)
 
         $spot: Number(intValue < 10) from accumulate(
-            score: Number(intValue < $gameScore.getScore()) from accumulate(
-                $game2Score: GameScore($user == user && $game != game),
-                sum($game2Score.getScore())
-            ),
-            count(score)
+            $game1Score: GameScore($game != game && $user == user && $gameScore.getScore() < score),
+            count($game1Score)
         )
     then
         insert(new Recommendation(RecommendationType.YOU_WILL_LIKE,"",$user, $game));
@@ -184,4 +191,73 @@ rule "Ako je ocena igre u top 10 ocena dodaj u BEST_RATED"
             System.out.println("Ako je ocena igre u top 10 ocena dodaj u BEST_RATED");
             System.out.println("Igrica: " + $game.getName() + " je dodata u BEST_RATED");
             System.out.println("-----------------------------------------------------------------");
+end
+
+rule "Ako je vreme igranja u poslednjih 7 dana manje od prosečnog vremena igranja za tog korisnika"
+    when
+        $user: AppUser()
+        accumulate(
+            $session: Session($user == user),
+            $avgPlaytime: average($session.getDuration())
+        )
+        $lastWeekPlaytimeAvg: Number(intValue < $avgPlaytime) from accumulate(
+            $session: Session($user == user) over window:time(7d),
+            average($session.getDuration())
+        )
+    then
+        System.out.println("Ako je vreme igranja u poslednjih 7 dana manje od prosečnog vremena igranja za tog korisnika");
+        System.out.println("Igrice za korisnika " + $user.getUsername() + " imaju 10% popusta");
+        System.out.println($avgPlaytime);
+        System.out.println($lastWeekPlaytimeAvg);
+        System.out.println("-----------------------------------------------------------------");
+end
+
+rule "Ako je igrač kupio igricu koju njegovi prijatelji igraju obavesti prijatelje"
+    when
+        $purchase: Purchase($user : user)
+        $friend: AppUser($friend != $user && $user.getFriends().contains($friend) && $friend.getGames().contains($purchase.getGame()))
+    then
+        System.out.println("Ako je igrač kupio igricu koju njegovi prijatelji igraju obavesti prijatelje");
+        System.out.println($friend.getUsername() + " je dobio notifikaciju za igru " + $purchase.getGame().getName());
+        insert(new Notification("Friend bought the game", $user.getUsername() + " bought " + $purchase.getGame(), $friend));
+        System.out.println("-----------------------------------------------------------------");
+end
+
+
+rule "Ako je izašla igrica sa korisnikovog wishlista i korisnik ima dovoljno kredita na balance-u obavesti korisnika"
+    when
+        $user : AppUser()
+        $game : Game($user.getWishlist().contains($game) && $user.getBalance() > price && releaseDate.isBefore(LocalDateTime.now()))
+    then
+        System.out.println("Ako je izašla igrica sa korisnikovog wishlista i korisnik ima dovoljno kredita na balance-u obavesti korisnika");
+        System.out.println($user.getUsername() + " je dobio notifikaciju za igru " + $game.getName());
+        insert(new Notification("Game got released", $game.getName() + " is out now and you have enough money to purchase it", $user));
+        System.out.println("-----------------------------------------------------------------");
+end
+
+rule "Ako igrač nije igrao igricu mesec dana dodaj u unfinished"
+    when
+        $user : AppUser()
+        $game : Game()
+        $numOfSessions: Number(intValue == 0) from accumulate(
+            $session : Session($user == user && $game == game) over window:time(30d),
+            count($session)
+        )
+    then
+        insert(new Recommendation(RecommendationType.UNFINISHED,"",$user, $game));
+        System.out.println("Ako igrač nije igrao igricu mesec dana dodaj u unfinished");
+        System.out.println("Igrica: " + $game.getName() + " je dodata u UNFINISHED za usera: " + $user.getUsername());
+        System.out.println("-----------------------------------------------------------------");
+end
+
+
+rule "Obavesti korisnika ako igrica na korisnikovom wishlistu ode na sale"
+    when
+        $user : AppUser()
+        $game : Game($user.getWishlist().contains($game) && onSale != 0 && saleEndDate != null && LocalDateTime.now().isBefore(saleEndDate))
+    then
+        System.out.println("Obavesti korisnika ako igrica na korisnikovom wishlistu ode na sale");
+        System.out.println($user.getUsername() + " je dobio notifikaciju za igru " + $game.getName() + " da je na sale od " + $game.getOnSale());
+        insert(new Notification("Igrica je na popustu", $game.getName() + " je na popustu od " + $game.getOnSale(), $user));
+        System.out.println("-----------------------------------------------------------------");
 end
