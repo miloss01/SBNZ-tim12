@@ -35,6 +35,7 @@ public class GameTests {
         user.setUsername("123");
         user.setBalance(25d);
         user.setSubscriptionType(SubscriptionType.GOLD);
+        user.setTimezone("+2");
 
         Game game1 = new Game("game1", "MMORPG", 10d, LocalDateTime.now().minusMonths(3), true, 5d, 8d, true, LocalDateTime.now().minusMonths(3), LocalDateTime.now().plusMonths(3));
         Game game2 = new Game("game2", "FPS", 5d, LocalDateTime.now().minusMonths(16), false, 10d, 8d, false, null, LocalDateTime.now().minusMonths(3));
@@ -69,8 +70,13 @@ public class GameTests {
         }
 
         AppUser friend = new AppUser("BestoFrendo", 100d, new ArrayList<>(List.of(game1, game2)));
-        friend.setFavouriteGenres(new ArrayList<>());
+        ArrayList favGenres = new ArrayList();
+        favGenres.add("asd");
+        favGenres.add("neki drugi");
+        friend.setFavouriteGenres(favGenres);
+        friend.setTimezone("+5");
         user.getFriends().add(friend);
+//        friend.getFriends().add(user);
         Purchase purchase = new Purchase(game1, user, LocalDateTime.now(), 30d);
         Purchase purchase1 = new Purchase(game2, user, LocalDateTime.now(), 30d);
         Purchase purchase2 = new Purchase(game2, user, LocalDateTime.now().minusDays(1), 30d);
@@ -79,6 +85,11 @@ public class GameTests {
 
         user.getWishlist().add(game1);
         user.getWishlist().add(game2);
+
+        FriendScore fs1 = new FriendScore(0d, user, friend);
+        FriendScore fs2 = new FriendScore(0d, friend, user);
+        ksession.insert(fs1);
+        ksession.insert(fs2);
 
         ksession.insert(user);
         ksession.insert(game1);

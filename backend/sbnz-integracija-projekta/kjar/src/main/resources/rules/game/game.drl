@@ -3,6 +3,7 @@ package game;
 import com.ftn.sbnz.model.models.Game;
 import com.ftn.sbnz.model.models.AppUser;
 import com.ftn.sbnz.model.models.GameScore;
+import com.ftn.sbnz.model.models.FriendScore;
 import com.ftn.sbnz.model.models.Session;
 import com.ftn.sbnz.model.models.Recommendation;
 import com.ftn.sbnz.model.models.Purchase;
@@ -298,6 +299,109 @@ rule "Ako je igrica u korisnikovom wishlistu otvorila open betu i korisnik nema 
         insert(new Notification("Dobili ste popust na subscription", $game.getName() + " je otvorila betu od " + $game.getBetaReleaseDate(), $user));
         System.out.println("-----------------------------------------------------------------");
 end
+
+
+
+
+
+
+
+//rule "Ako trenutni korisnik i neki drugi korisnik imaju iste omiljene žanrove"
+//no-loop true
+//    when
+//        $user : AppUser()
+//        $user1 : AppUser($user != $user1)
+//        $score : FriendScore(user == $user && friendRecommendation == $user1 && $user.getFavouriteGenres().containsAll($user1.getFavouriteGenres()) && $user1.getFavouriteGenres().containsAll($user.getFavouriteGenres()))
+//    then
+//        modify($score){
+//            setScore($score.getScore() + 10)
+//        }
+//
+//        System.out.println("Ako trenutni korisnik i neki drugi korisnik imaju iste omiljene žanrove");
+//        System.out.println($score.getUser().getUsername() + " povecano za prijatelja " + $score.getFriendRecommendation().getUsername() + " i sad je: " + $score.getScore());
+//        System.out.println("-----------------------------------------------------------------");
+//end
+//
+//rule "Ako trenutni korisnik i neki drugi korisnik nemaju iste omiljene žanrove"
+//no-loop true
+//    when
+//        $user : AppUser()
+//        $user1 : AppUser($user != $user1)
+//        $score : FriendScore(user == $user && friendRecommendation == $user1 && !($user.getFavouriteGenres().containsAll($user1.getFavouriteGenres())) && !($user1.getFavouriteGenres().containsAll($user.getFavouriteGenres())))
+//    then
+//        modify($score){
+//            setScore($score.getScore() - 10)
+//        }
+//
+//        System.out.println("Ako trenutni korisnik i neki drugi korisnik nemaju iste omiljene žanrove");
+//        System.out.println($score.getUser().getUsername() + " smanjeno za prijatelja " + $score.getFriendRecommendation().getUsername() + " i sad je: " + $score.getScore());
+//        System.out.println("-----------------------------------------------------------------");
+//end
+
+rule "Ako se vremenska zona trenutnog i drugog korisnika ne razlikuje za više od 4h"
+no-loop true
+    when
+        $user : AppUser()
+        $user1 : AppUser(username != $user.getUsername())
+        $score : FriendScore(user.getUsername() == $user.getUsername() && friendRecommendation.getUsername() == $user1.getUsername() && Math.abs(Integer.parseInt($user.getTimezone()) - Integer.parseInt($user1.getTimezone())) < 4)
+    then
+        modify($score){
+            setScore($score.getScore() + 15)
+        }
+
+        System.out.println("Ako se vremenska zona trenutnog i drugog korisnika ne razlikuje za više od 4h");
+        System.out.println($score.getUser().getUsername() + " povecano za prijatelja " + $score.getFriendRecommendation().getUsername() + " i sad je: " + $score.getScore());
+        System.out.println("-----------------------------------------------------------------");
+end
+
+rule "Ako je korisnik prijatelj sa prijateljima trenutnog korisnika"
+no-loop true
+    when
+        $user : AppUser()
+        $user1 : AppUser(friends.containsAll($user.getFriends()) && !($user.getFriends().contains($user1)))
+        $score : FriendScore(user == $user && friendRecommendation == $user1)
+    then
+        modify($score){
+            setScore($score.getScore() + 15)
+        }
+
+        System.out.println("Ako je korisnik prijatelj sa prijateljima trenutnog korisnika");
+        System.out.println($score.getUser().getUsername() + " povecano za prijatelja " + $score.getFriendRecommendation().getUsername() + " i sad je: " + $score.getScore());
+        System.out.println("-----------------------------------------------------------------");
+end
+
+//rule "Ako je korisnik u top 10 korisnika po score-u i korisnik ima mesta u prijateljima"
+//    when
+//        $user : AppUser(friends.size() < 6)
+//        $friend : AppUser($friend != $user)
+//        $friendScore : FriendScore(user == $friend)
+//        $numOfScores: Number(intValue < 10) from accumulate(
+//            $score : FriendScore(score < $friendScore.getScore()),
+//            count($score)
+//        )
+//    then
+//        System.out.println("Ako je korisnik u top 10 korisnika po score-u i korisnik ima mesta u prijateljima");
+//        System.out.println($user.getUsername() + " je dobio notifikaciju za novog prijatelja");
+//        insert(new Notification("Preporuka za prijatelja", $friend.getUsername() + " je preporucen", $user));
+//        System.out.println("-----------------------------------------------------------------");
+//end
+//
+//rule "Ako se trenutni korisnik približio gornjem limitu prijatelja i zadnja odigrana sesija je bila pre više od 2 meseca"
+//    when
+//        $user : AppUser()
+//        $friend : AppUser($friend != $user && friends.size() == 4 && $user.getFriends().contains($friend))
+//        $numOfSessions: Number(intValue == 0) from accumulate(
+//            $session : Session(user == $friend) over window:time(60d),
+//            count($session)
+//        )
+//    then
+//        System.out.println("Ako se trenutni korisnik približio gornjem limitu prijatelja i zadnja odigrana sesija je bila pre više od 2 meseca");
+//        System.out.println($user.getUsername() + " je dobio notifikaciju za izbacivanje prijatelja");
+//        insert(new Notification("Preporuka za izbacivanje prijatelja", $friend.getUsername() + " je preporucen za izbacivanje", $user));
+//        System.out.println("-----------------------------------------------------------------")
+//end
+
+
 
 
 
