@@ -8,4 +8,7 @@
     <kbase name="gameKbase" eventProcessingMode="stream" packages="game">
         <ksession name="gameKsession" clockType="pseudo"/>
     </kbase>
+    <kbase name="forward1Kbase" eventProcessingMode="stream" packages="forward">
+        <ksession name="forward1Ksession" clockType="pseudo"/>
+    </kbase>
 </kmodule>

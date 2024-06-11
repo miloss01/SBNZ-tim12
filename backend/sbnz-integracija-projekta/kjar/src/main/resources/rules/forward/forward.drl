@@ -1,0 +1,147 @@
+package forward;
+
+import com.ftn.sbnz.model.models.Game;
+import com.ftn.sbnz.model.models.AppUser;
+import com.ftn.sbnz.model.models.GameScore;
+import com.ftn.sbnz.model.models.FriendScore;
+import com.ftn.sbnz.model.models.Session;
+import com.ftn.sbnz.model.models.Recommendation;
+import com.ftn.sbnz.model.models.Purchase;
+import com.ftn.sbnz.model.models.Notification;
+import com.ftn.sbnz.model.models.enums.RecommendationType;
+import com.ftn.sbnz.model.models.enums.SubscriptionType;
+import com.ftn.sbnz.model.models.FriendScore;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.List;
+
+rule "povecaj score za zanr"
+salience 100
+    when
+        $user: AppUser()
+        $game: Game($user.getFavouriteGenres().contains($game.getGenre()))
+        $gameScore: GameScore($user == $gameScore.getUser() && $game == $gameScore.getGame())
+    then
+        System.out.println("------------povecaj score za zanr------------");
+        System.out.println("Skor igrice " + $gameScore.getGame().getName() + " povecan sa: " + $gameScore.getScore().toString());
+        $gameScore.increaseScore(10d);
+        System.out.println("Na: " + $gameScore.getScore().toString() + " za igraca " + $user.getUsername() + " jer je medju igracevim omiljenim zanrovima");
+        System.out.println("-----------------------------------------------------------------");
+end
+
+
+rule "povecaj score ako je igra dobro ocenjenja"
+salience 100
+    when
+        $user: AppUser()
+        $game: Game($game.getRating() > 7)
+        $gameScore: GameScore($user == $gameScore.getUser() && $game == $gameScore.getGame())
+    then
+        System.out.println("------------povecaj score ako je igra dobro ocenjenja------------");
+        System.out.println("Skor igrice " + $gameScore.getGame().getName() + " povecan sa: " + $gameScore.getScore().toString());
+        $gameScore.increaseScore(10d);
+        System.out.println("Na: " + $gameScore.getScore().toString() + " za igraca " + $user.getUsername() + " jer je dobro ocenjenja");
+        System.out.println("-----------------------------------------------------------------");
+end
+
+
+rule "povecaj score ako je igrica igrana puno u poslednjih nedelju dana"
+salience 100
+    when
+        $user: AppUser()
+        $game: Game()
+        $sessionNum: Number(intValue > 5) from accumulate(
+            $session: Session(game == $game) over window:time(7d),
+            count($session)
+        )
+        $gameScore: GameScore($user == $gameScore.getUser() && $game == $gameScore.getGame())
+    then
+            System.out.println("------------povecaj score ako je igrica igrana puno u poslednjih nedelju dana------------");
+            System.out.println("Skor igrice " + $gameScore.getGame().getName() + " povecan sa: " + $gameScore.getScore().toString());
+            $gameScore.increaseScore(10d);
+            System.out.println("Na: " + $gameScore.getScore().toString() + " za igraca " + $user.getUsername() + " jer je dosta puta igrana");
+            System.out.println("-----------------------------------------------------------------");
+end
+
+rule "Ako je score igrice u top 10 i njena cena je u donjih 30% dodati BEST_BUY"
+    when
+        $user: AppUser()
+        $game: Game()
+        $gameScore: GameScore($user == user && $game == game)
+
+        $spot: Number(intValue < 10) from accumulate(
+            $game1Score: GameScore($game != game && $user == user && $gameScore.getScore() < score),
+            count($game1Score)
+        )
+
+        accumulate(
+            $game1: Game(),
+            $count: count($game1)
+        )
+
+        $numOfGames: Number(intValue < ($count * 30 / 100)) from accumulate(
+            $game2: Game(price < $game.getPrice() && $game2 != $game),
+            count($game2)
+        )
+    then
+        insert(new Recommendation(RecommendationType.BEST_BUY,"",$user, $game));
+        System.out.println("---------Ako je score igrice u top 10 i njena cena je u donjih 30% dodati BEST_BUY---------");
+        System.out.println("Igrica: " + $game.getName() + " je dodata u BEST_BUY");
+        System.out.println("-----------------------------------------------------------------");
+end
+
+rule "Ako je igrica BEST_BUY i na sale-u je još manje od 24h obavesti korisnika"
+    when
+        $recommendation : Recommendation(type == RecommendationType.BEST_BUY && game.getOnSale() != 0 && LocalDateTime.now().minusHours(24).isBefore(game.getSaleEndDate()))
+    then
+        System.out.println("---------Ako je igrica BEST_BUY i na sale-u je još manje od 24h obavesti korisnika---------");
+        System.out.println($recommendation.getUser().getUsername() + " got a notification about the game " + $recommendation.getGame().getName());
+        insert(new Notification("Game is on sale for less than 24h", $recommendation.getUser().getUsername() + " got a notification about the game " + $recommendation.getGame().getName(), $recommendation.getUser()));
+        System.out.println("-----------------------------------------------------------------");
+end
+
+rule "Ako igra otvori open betu i korisnik poseduje subscprition GOLD ili veći"
+    when
+        $game : Game(beta == true && betaReleaseDate.isBefore(LocalDateTime.now()))
+        $user : AppUser(subscriptionType != null && subscriptionType >= SubscriptionType.GOLD)
+    then
+        System.out.println("---------Ako igrao tvori open betu i korisnik poseduje subscprition GOLD ili veći---------");
+        System.out.println($user.getUsername() + " got beta access for " + $game.getName());
+        insert(new Notification("Beta:" + $game.getName(), $user.getUsername() + " got beta access for " + $game.getName(), $user));
+        System.out.println("-----------------------------------------------------------------");
+end
+
+rule "Ako korisnik1 i korisnik2 imaju pristup istoj beti i vole iste žanrove igara povećaj score korisnika2"
+no-loop true
+    when
+        $user1: AppUser()
+        $user2: AppUser($user1 != $user2 && favouriteGenres.containsAll($user1.getFavouriteGenres()) && $user1.getFavouriteGenres.containsAll(favouriteGenres))
+        $notification1 : Notification(user == $user1 && name.startsWith("Beta:"))
+        $notification2 : Notification(user == $user2 && $notification1 != $notification2 && name == $notification1.getName() && name.startsWith("Beta:"))
+        $friendScore : FriendScore(user == $user1 && friendRecommendation == $user2)
+    then
+        modify($friendScore){
+            updateScore(10d)
+        }
+
+        System.out.println("---------Ako korisnik1 i korisnik2 imaju pristup istoj beti i vole iste žanrove igara povećaj score korisnika2---------");
+        System.out.println($user1.getUsername() + " i " + $user2.getUsername() + " imaju pristup istoj beti i friend score je povecan za 10");
+        System.out.println("Novi score je: " + $friendScore.getScore());
+        System.out.println("-----------------------------------------------------------------");
+end
+
+rule "Ukoliko je score korisnika2 u top 10 preporuči korisnika2 za prijatelja"
+    when
+        $friendScore: FriendScore()
+
+        $spot: Number(intValue < 10) from accumulate(
+            $friend1Score: FriendScore($friendScore.getUser() != user && $friendScore.getFriendRecommendation() == friendRecommendation && $friendScore.getScore() < score),
+            count($friend1Score)
+        )
+    then
+        System.out.println("Ukoliko je score korisnika2 u top 10 preporuči korisnika2 za prijatelja");
+        System.out.println($friendScore.getUser().getUsername() + " je dobio preporuku da doda " + $friendScore.getFriendRecommendation().getUsername());
+        insert(new Notification("Friend Recommendation", $friendScore.getUser() + " je dobio preporuku da doda " + $friendScore.getFriendRecommendation(), $friendScore.getUser()));
+        System.out.println("-----------------------------------------------------------------");
+end
