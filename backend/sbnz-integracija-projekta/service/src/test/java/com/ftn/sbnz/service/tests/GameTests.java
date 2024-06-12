@@ -1,5 +1,6 @@
 package com.ftn.sbnz.service.tests;
 
+import java.io.InputStream;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -7,16 +8,28 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.ftn.sbnz.model.models.*;
 import com.ftn.sbnz.model.models.enums.SubscriptionType;
 import org.drools.core.time.SessionPseudoClock;
+import org.drools.template.DataProvider;
+import org.drools.template.DataProviderCompiler;
+import org.drools.template.objects.ArrayDataProvider;
 import org.junit.Test;
 import org.kie.api.KieServices;
+import org.kie.api.builder.Message;
+import org.kie.api.builder.Results;
+import org.kie.api.io.ResourceType;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
+import org.kie.internal.utils.KieHelper;
+import org.kie.api.builder.KieBuilder;
+import org.kie.api.builder.KieFileSystem;
+import org.kie.api.builder.Message.Level;
+import org.kie.api.runtime.conf.ClockTypeOption;
 
 public class GameTests {
 
@@ -188,8 +201,6 @@ public class GameTests {
         rulesFired = ksession.fireAllRules();
         System.out.println(rulesFired);
 
-        String str = "adsasdsada";
-        str.startsWith("asdas");
     }
 
 
@@ -201,7 +212,180 @@ public class GameTests {
         KieSession ksession = kContainer.newKieSession("gameKsession");
         SessionPseudoClock clock = ksession.getSessionClock();
 
-        
+        List<String> gameGenres = List.of("MMORPG", "FPS", "RPG", "RTS", "Sport", "Betting", "Racing");
+        List<SubscriptionType> subscriptionTypes = List.of(SubscriptionType.BRONZE, SubscriptionType.SILVER, SubscriptionType.GOLD, SubscriptionType.PLATINUM);
+
+        int max;
+        int min;
+
+        ArrayList<AppUser> users = new ArrayList<>();
+        final Integer NUM_OF_USERS = 30;
+        for(int i = 0; i < NUM_OF_USERS; i++){
+            AppUser user = new AppUser();
+            ArrayList<String> favouriteGenres = new ArrayList<>();
+            for(String genre : gameGenres){
+                max = 1;
+                min = 0;
+                int num = (int)Math.floor(Math.random() *(max - min + 1) + min);
+                if(num == 1) favouriteGenres.add(genre);
+            }
+            user.setFavouriteGenres(favouriteGenres);
+            user.setUsername(String.valueOf(i));
+            max = 200;
+            min = 0;
+            user.setBalance(Double.valueOf((int)Math.floor(Math.random() *(max - min + 1) + min)));
+
+            max = 3;
+            min = 0;
+            int num = (int)Math.floor(Math.random() *(max - min + 1) + min);
+            user.setSubscriptionType(subscriptionTypes.get(num));
+
+            max = 12;
+            min = -12;
+            num = (int)Math.floor(Math.random() *(max - min + 1) + min);
+            user.setTimezone(String.valueOf(num));
+            users.add(user);
+        }
+
+        ArrayList<FriendScore> friendScores = new ArrayList<>();
+        for(int i = 0; i < NUM_OF_USERS; i++){
+            for(int j = i + 5; j < NUM_OF_USERS; j += Math.ceil(NUM_OF_USERS / 5)){
+                users.get(i).getFriends().add(users.get(j));
+                users.get(j).getFriends().add(users.get(i));
+            }
+        }
+
+        for(int i = 0; i < NUM_OF_USERS; i++){
+            for(int j = i + 1; j < NUM_OF_USERS; j++){
+                FriendScore friendScore1 = new FriendScore(0d, users.get(i), users.get(j));
+                FriendScore friendScore2 = new FriendScore(0d, users.get(j), users.get(i));
+                friendScores.add(friendScore1);
+                friendScores.add(friendScore2);
+            }
+        }
+
+        ArrayList<Game> games = new ArrayList<>();
+        for(int i = 0; i < 30; i++){
+            Game game = new Game();
+            Game game1 = new Game("game1", "MMORPG", 10d, LocalDateTime.now().minusMonths(3), true, 5d, 8d, true, LocalDateTime.now().minusMonths(3), LocalDateTime.now().plusMonths(3));
+            game.setName("game" + i);
+            max = 6;
+            min = 0;
+            game.setGenre(gameGenres.get((int)Math.floor(Math.random() *(max - min + 1) + min)));
+            max = 60;
+            min = 0;
+            game.setPrice(Math.floor(Math.random() *(max - min + 1) + min));
+            max = 2 * 30 * 24;
+            min = -2 * 30 * 24;
+            game.setReleaseDate(LocalDateTime.now().plusHours((int)Math.floor(Math.random() *(max - min + 1) + min)));
+            game.setSinglePlayer(false);
+            max = 50;
+            min = 0;
+            game.setOnSale(Math.floor(Math.random() *(max - min + 1) + min));
+            max = 10;
+            min = 1;
+            game.setRating(Math.floor(Math.random() *(max - min + 1) + min));
+            max = 1;
+            min = 0;
+            int num = (int)Math.floor(Math.random() *(max - min + 1) + min);
+            if(num == 1)
+                game.setBeta(true);
+            else
+                game.setBeta(false);
+
+            max = 2 * 30 * 24;
+            min = -2 * 30 * 24;
+            if(game.getBeta())
+                game.setBetaReleaseDate(LocalDateTime.now().plusHours((int)Math.floor(Math.random() *(max - min + 1) + min)));
+            if(game.getOnSale() != 0)
+                game.setSaleEndDate(LocalDateTime.now().plusHours((int)Math.floor(Math.random() *(max - min + 1) + min)));
+            games.add(game);
+        }
+
+        ArrayList<GameScore> gameScores = new ArrayList<>();
+        for(AppUser user : users){
+            for(Game game : games){
+                GameScore gameScore = new GameScore(0d, user, game);
+                gameScores.add(gameScore);
+            }
+        }
+
+        for(AppUser user : users){
+            ksession.insert(user);
+        }
+        for(FriendScore friendScore: friendScores){
+            ksession.insert(friendScore);
+        }
+        for(Game game: games){
+            ksession.insert(game);
+        }
+        for(GameScore gameScore : gameScores){
+            ksession.insert(gameScore);
+        }
+
+        int rulesFired = -1;
+
+
+        System.out.println("Started");
+        rulesFired = ksession.fireAllRules();
+        System.out.println(rulesFired);
     }
 
+    @Test
+    public void template1Test() {
+        InputStream template = GameTests.class.getResourceAsStream("/templatetable/template1.drt");
+
+        DataProvider dataProvider = new ArrayDataProvider(new String[][]{
+                new String[]{"BRONZE", "5", "100", "5"},
+                new String[]{"SILVER", "10", "200", "10"},
+                new String[]{"GOLD", "20", "300", "20"},
+                new String[]{"PLATINUM", "30", "400", "30"},
+        });
+
+        DataProviderCompiler converter = new DataProviderCompiler();
+        String drl = converter.compile(dataProvider, template);
+
+        System.out.println(drl);
+
+//        KieSession ksession = createKieSessionFromDRL(drl);
+
+    }
+
+    @Test
+    public void template2Test() {
+        InputStream template = GameTests.class.getResourceAsStream("/templatetable/template2.drt");
+
+        DataProvider dataProvider = new ArrayDataProvider(new String[][]{
+                new String[]{"2", "20", "10"},
+                new String[]{"4", "15", "30"},
+                new String[]{"6", "10", "60"},
+                new String[]{"8", "8", "100"},
+        });
+
+        DataProviderCompiler converter = new DataProviderCompiler();
+        String drl = converter.compile(dataProvider, template);
+
+        System.out.println(drl);
+
+//        KieSession ksession = createKieSessionFromDRL(drl);
+
+    }
+
+    private KieSession createKieSessionFromDRL(String drl){
+        KieHelper kieHelper = new KieHelper();
+        kieHelper.addContent(drl, ResourceType.DRL);
+
+        Results results = kieHelper.verify();
+
+        if (results.hasMessages(Message.Level.WARNING, Message.Level.ERROR)){
+            List<Message> messages = results.getMessages(Message.Level.WARNING, Message.Level.ERROR);
+            for (Message message : messages) {
+                System.out.println("Error: "+message.getText());
+            }
+
+            throw new IllegalStateException("Compilation errors were found. Check the logs.");
+        }
+
+        return kieHelper.build().newKieSession();
+    }
 }

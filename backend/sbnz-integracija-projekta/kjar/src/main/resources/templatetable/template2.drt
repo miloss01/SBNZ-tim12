@@ -1,0 +1,41 @@
+template header
+hours
+friendsCount
+amount
+
+package templatetable;
+
+import com.ftn.sbnz.model.models.Game;
+import com.ftn.sbnz.model.models.AppUser;
+import com.ftn.sbnz.model.models.GameScore;
+import com.ftn.sbnz.model.models.FriendScore;
+import com.ftn.sbnz.model.models.Session;
+import com.ftn.sbnz.model.models.Recommendation;
+import com.ftn.sbnz.model.models.Purchase;
+import com.ftn.sbnz.model.models.Notification;
+import com.ftn.sbnz.model.models.enums.RecommendationType;
+import com.ftn.sbnz.model.models.enums.SubscriptionType;
+import com.ftn.sbnz.model.models.FriendScore;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.List;
+
+template "template2"
+
+rule "Ako se vremenska zona korisnika razlikuje od trenutnog korisnika za @{hours} i korisnik ima manje od @{friendsCount} prijatelja, smanji score korisnika za @{amount}"
+    when
+        $user1 : AppUser()
+        $user2 : AppUser($user1 != $user2 && friends.size() < @{friendsCount} && Math.abs(Integer.parseInt($user1.getTimezone()) - Integer.parseInt($user2.getTimezone())) < @{hours})
+        $friendScore : FriendScore(user == $user1 && friendRecommendation == $user2)
+    then
+        modify($friendScore){
+            setScore($friendScore.getScore() - @{amount})
+        }
+
+        System.out.println("Ako se vremenska zona korisnika razlikuje od trenutnog korisnika za @{hours} i korisnik ima manje od @{friendsCount} prijatelja, smanji score korisnika za @{amount}");
+        System.out.println("novi score je: " + $friendScore.getScore());
+        System.out.println("-----------------------------------------------------------------");
+end
+
+end template

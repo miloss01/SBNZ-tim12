@@ -11,6 +11,15 @@ public class GameScore implements Serializable {
     private AppUser user;
     private Game game;
 
+    public GameScore(Double score, AppUser user, Game game) {
+        this.score = score;
+        this.user = user;
+        this.game = game;
+    }
+
+    public GameScore() {
+    }
+
     public Double increaseScore(Double value){
         this.score += value;
         return score;
