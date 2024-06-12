@@ -1,7 +1,10 @@
 package com.ftn.sbnz.model.models;
 
+import org.kie.api.definition.type.PropertyReactive;
+
 import java.io.Serializable;
 
+@PropertyReactive
 public class GameScore implements Serializable {
 
     private Double score;

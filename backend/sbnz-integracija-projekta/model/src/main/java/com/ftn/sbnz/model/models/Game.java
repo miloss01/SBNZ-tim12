@@ -1,9 +1,12 @@
 package com.ftn.sbnz.model.models;
 
+import org.kie.api.definition.type.PropertyReactive;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Date;
 
+@PropertyReactive
 public class Game implements Serializable {
 
     private String name;

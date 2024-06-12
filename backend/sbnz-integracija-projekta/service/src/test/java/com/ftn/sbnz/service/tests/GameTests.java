@@ -191,4 +191,17 @@ public class GameTests {
         String str = "adsasdsada";
         str.startsWith("asdas");
     }
+
+
+    @Test
+    public void testZaOdbranu(){
+
+        KieServices ks = KieServices.Factory.get();
+        KieContainer kContainer = ks.getKieClasspathContainer();
+        KieSession ksession = kContainer.newKieSession("gameKsession");
+        SessionPseudoClock clock = ksession.getSessionClock();
+
+        
+    }
+
 }

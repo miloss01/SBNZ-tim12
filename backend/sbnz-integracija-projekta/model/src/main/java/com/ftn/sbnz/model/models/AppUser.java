@@ -1,10 +1,12 @@
 package com.ftn.sbnz.model.models;
 
 import com.ftn.sbnz.model.models.enums.SubscriptionType;
+import org.kie.api.definition.type.PropertyReactive;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 
+@PropertyReactive
 public class AppUser implements Serializable {
 
     private String username;
